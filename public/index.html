@@ -6,7 +6,6 @@
 </head>
 <body>
 <title>LocateWright</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
@@ -1391,9 +1390,11 @@ UKC.sources.push(["DoF NI rate poundages 2026/27", "https://www.finance-ni.gov.u
 const $ = s => document.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else if (v !== null && v !== undefined && v !== false) e.setAttribute(k, v === true ? "" : v); } for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k)); return e; };
 const gbp = (n, dp = 0) => n == null || isNaN(n) ? "—" : "£" + Number(n).toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp });
+/* AI features (local guide, Ask a local) only run where an AI runtime is provided; they are hidden everywhere else. */
+const AI = !!window.claude;
 /* ---------- visitor analytics (live site only) ----------
    Sends page views and which places, views and tabs are opened to /api/event on the site's own Worker.
-   Off inside Claude, when opened as a file, on localhost, and when the browser sends Do Not Track or Global Privacy Control.
+   Off inside the AI runtime, when opened as a file, on localhost, and when the browser sends Do Not Track or Global Privacy Control.
    No names, emails, IP addresses or chat text are sent. */
 const TRACK_ON = !window.claude && /^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
   && navigator.doNotTrack !== "1" && window.doNotTrack !== "1" && !navigator.globalPrivacyControl;
@@ -1539,14 +1540,14 @@ function renderGlance() {
   $("#gRent").textContent = p.rent ? gbp(p.rent) + " (ONS, " + p.rentMonth + ")" : "No current figure";
   $("#gTax").textContent = gbp(localTaxYear(p).amount / 12) + (p.nation === "ni" ? " rates" : " Band D");
   $("#gEss").textContent = p.rent ? gbp(essentialsMonth(p)) : "Add your rent";
-  $("#gHello").textContent = p.dialect ? "“" + p.dialect[0][0] + "” · " + p.dialect[0][1] : (guideFor(p)?.dialect?.[0] ? "“" + guideFor(p).dialect[0][0] + "” · " + guideFor(p).dialect[0][1] : "See the local guide");
+  $("#gHello").textContent = p.dialect ? "“" + p.dialect[0][0] + "” · " + p.dialect[0][1] : (guideFor(p)?.dialect?.[0] ? "“" + guideFor(p).dialect[0][0] + "” · " + guideFor(p).dialect[0][1] : AI ? "See the local guide" : "—");
 }
 document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (!g) return; e.preventDefault(); if (g.dataset.go === "budget") budget.load(state.place); showView(g.dataset.go); if (g.dataset.go === "explore") document.getElementById("v-explore").scrollIntoView({ behavior: "smooth", block: "start" }); });
 function selectPlace(id, fly) {
   state.place = id; store.set("place", id);
   const p = byId[id]; if (state.nation !== p.nation) { state.nation = p.nation; store.set("nation", p.nation); }
   if (p.generic) { state.council = p.ci; if (p.nation === "england") state.region = C[p.ci][2]; } else if (p.ci != null && state.council >= 0) state.council = p.ci;
-  if (p.generic && !["overview", "guide", "costs", "council", "env"].includes(state.tab)) state.tab = "overview";
+  if (p.generic && !GTABS.some(([k]) => k === state.tab)) state.tab = "overview";
   renderPicker(); renderDossier(); renderGlance(); map.select(id, fly);
   if ($("#v-explore").hidden) showView("explore");
   if (booted) track("place", Object.assign({ detail: trackVia }, placeInfo(id))); trackVia = "browse";
@@ -1586,7 +1587,7 @@ function tabBody(p, n) {
         el("dt", { text: "Renting law" }), el("dd", { text: n.tenancy })));
       out.push(el("h3", { text: "Neighbourhoods to look at" }));
       out.push(el("ul", { class: "list cols" }, p.hoods.map(([a, b, pc]) => el("li", {}, el("b", {}, a, pc ? el("span", { class: "pc", text: pc }) : null), el("span", { text: b })))));
-      out.push(el("div", { class: "row" }, el("button", { class: "btn", onclick: () => { budget.load(p.id); showView("budget"); }, text: "Build my budget" }), el("button", { class: "btn ghost", onclick: () => { askSetPlace(p.id); showView("ask"); }, text: "Ask a local about " + p.name })));
+      out.push(el("div", { class: "row" }, el("button", { class: "btn", onclick: () => { budget.load(p.id); showView("budget"); }, text: "Build my budget" }), AI ? el("button", { class: "btn ghost", onclick: () => { askSetPlace(p.id); showView("ask"); }, text: "Ask a local about " + p.name }) : null));
       break;
     case "people":
       out.push(el("p", { text: p.people }));
@@ -1638,7 +1639,7 @@ function tabBody(p, n) {
   }
   return out;
 }
-const GTABS = [["overview", "Overview"], ["guide", "Local guide"], ["costs", "Living costs"], ["council", "Council & services"], ["env", "Environment"]];
+const GTABS = [["overview", "Overview"], ["guide", "Local guide"], ["costs", "Living costs"], ["council", "Council & services"], ["env", "Environment"]].filter(([k]) => AI || k !== "guide");
 function renderGeneric(p, n, d) {
   const lt = localTaxYear(p), c = C[p.ci];
   d.append(el("div", { class: "dhead" },
@@ -1678,7 +1679,7 @@ function genericBody(p, n) {
         el("div", { class: "row" }, el("button", { class: "btn secondary", type: "button", onclick: () => selectPlace(near.id, true), text: "Open " + near.name }))));
       out.push(el("h3", { text: "Places nearby" }));
       out.push(el("div", { class: "row" }, nearbyTowns(p).map(([d, i]) => el("button", { class: "chip", type: "button", onclick: () => selectPlace("t" + i, true) }, T[i][0], el("span", { class: "muted", text: " " + Math.round(d) + " km" })))));
-      out.push(el("div", { class: "row" }, el("button", { class: "btn", type: "button", onclick: () => { state.tab = "guide"; renderDossier(); }, text: "Read the local guide" }), el("button", { class: "btn ghost", type: "button", onclick: () => { budget.load(p.id); showView("budget"); }, text: "Build my budget" }), el("button", { class: "btn ghost", type: "button", onclick: () => { askSetPlace(p.id); showView("ask"); }, text: "Ask a local" })));
+      out.push(el("div", { class: "row" }, AI ? el("button", { class: "btn", type: "button", onclick: () => { state.tab = "guide"; renderDossier(); }, text: "Read the local guide" }) : null, el("button", { class: AI ? "btn ghost" : "btn", type: "button", onclick: () => { budget.load(p.id); showView("budget"); }, text: "Build my budget" }), AI ? el("button", { class: "btn ghost", type: "button", onclick: () => { askSetPlace(p.id); showView("ask"); }, text: "Ask a local" }) : null));
       break; }
     case "guide": out.push(...guideView(p)); break;
     case "costs": case "council": out.push(...tabBody(p, n)); break;
@@ -1714,18 +1715,18 @@ let guideBusy = null;
 function guideView(p) {
   const g = guideFor(p), out = [];
   if (!g) {
-    out.push(el("p", { text: `LocateWright has full hand-written guides for ${PLACES.length} places. For ${p.name}, Claude can write a local guide covering the people, local words, food, history, places to visit, areas to consider and how to get around.` }));
+    out.push(el("p", { text: `LocateWright has full hand-written guides for ${PLACES.length} places. For ${p.name}, our AI guide can write a local guide covering the people, local words, food, history, places to visit, areas to consider and how to get around.` }));
     const btn = el("button", { class: "btn", type: "button", text: guideBusy === p.id ? "Writing the guide…" : "Write the local guide" });
     btn.disabled = guideBusy === p.id || !sample;
-    const status = el("p", { class: "muted small", text: sample ? "Uses your Claude account. It takes up to a minute." : "The AI guide works when LocateWright is opened in Claude." });
+    const status = el("p", { class: "muted small", text: sample ? "It takes up to a minute." : "The AI guide isn't available right now." });
     btn.onclick = async () => {
-      guideBusy = p.id; btn.disabled = true; btn.textContent = "Writing the guide…"; status.textContent = "Claude is writing the guide…";
+      guideBusy = p.id; btn.disabled = true; btn.textContent = "Writing the guide…"; status.textContent = "Writing the guide…";
       try {
         const j = await sample.json(guidePrompt(p), { cache: { gcTime: 86400000 } });
         if (!j || typeof j !== "object") throw { code: "invalid_json" };
         guideMem[guideKey(p)] = j; store.set(guideKey(p), j); track("ai_guide", placeInfo(p.id));
       } catch (e) {
-        status.textContent = { not_granted: "The guide needs your permission to use Claude.", rate_limited: "Too many requests just now. Try again in a minute.", invalid_json: "The guide came back in the wrong format. Try again.", sampling_disabled: "Claude isn't available for this account." }[e.code] || "Something went wrong writing the guide. Try again.";
+        status.textContent = { not_granted: "The guide needs your permission to run.", rate_limited: "Too many requests just now. Try again in a minute.", invalid_json: "The guide came back in the wrong format. Try again.", sampling_disabled: "The AI guide isn't available for this account." }[e.code] || "Something went wrong writing the guide. Try again.";
         guideBusy = null; btn.disabled = false; btn.textContent = "Write the local guide"; return;
       }
       guideBusy = null; if (state.place === p.id && state.tab === "guide") renderDossier(); renderGlance();
@@ -1734,7 +1735,7 @@ function guideView(p) {
     return out;
   }
   const L = (x) => Array.isArray(x) ? x : [];
-  out.push(el("p", { class: "note", text: "Written by Claude from general knowledge. Check important details locally." }));
+  out.push(el("p", { class: "note", text: "Written by AI from general knowledge. Check important details locally." }));
   if (g.summary) out.push(el("p", { style: "font-size:17px", text: g.summary }));
   if (g.people) { out.push(el("h3", { text: "People" }), el("p", { text: g.people })); }
   if (L(g.dialect).length) { out.push(el("h3", { text: "Local words" }), el("div", { class: "phrases" }, L(g.dialect).map(x => el("div", { class: "phrase" }, el("b", { text: String(x[0] ?? "") }), el("span", { text: String(x[1] ?? "") }))))); }
@@ -1789,7 +1790,8 @@ q.addEventListener("keydown", e => { const bs = [...res.querySelectorAll("button
 document.addEventListener("click", e => { if (!e.target.closest(".search")) res.hidden = true; });
 
 /* ---------- views ---------- */
-const VIEWS = ["explore", "compare", "budget", "ask", "settle"];
+const VIEWS = ["explore", "compare", "budget", "ask", "settle"].filter(v => AI || v !== "ask");
+if (!AI) { const a = document.querySelector('.nav a[data-view="ask"]'); if (a) a.remove(); document.querySelectorAll(".nav a b").forEach((b, i) => b.textContent = i + 1); }
 function showView(v) {
   for (const k of VIEWS) $("#v-" + k).hidden = k !== v;
   document.querySelectorAll(".nav a").forEach(a => a.setAttribute("aria-current", a.dataset.view === v ? "page" : "false"));
@@ -1937,7 +1939,7 @@ const settle = (() => {
   return { render };
 })();
 
-/* ---------- ask a local (Claude) ---------- */
+/* ---------- ask a local (AI) ---------- */
 let sample = null, turns = [], ctl = null, askOff = false;
 const askPlace = $("#askPlace");
 askPlace.append(...NKEYS.map(k => el("optgroup", { label: NATIONS[k].name }, PLACES.filter(p => p.nation === k).map(p => el("option", { value: p.id, text: p.name })))));
@@ -1955,7 +1957,7 @@ function addMsg(cls, text) { const m = el("div", { class: "msg " + cls, text });
 $("#askForm").addEventListener("submit", async e => {
   e.preventDefault();
   const t = $("#askInput").value.trim(); if (!t) return;
-  if (!sample) { addMsg("sys", "The AI guide isn't available in this view. Open LocateWright inside Claude to use it."); return; }
+  if (!sample) { addMsg("sys", "The AI guide isn't available right now."); return; }
   $("#askInput").value = ""; addMsg("me", t); turns.push({ role: "user", content: t });
   const bubble = addMsg("ai", "Thinking…");
   $("#askBtn").disabled = true; $("#stopBtn").hidden = false; ctl = new AbortController();
@@ -1965,7 +1967,7 @@ $("#askForm").addEventListener("submit", async e => {
     turns.push({ role: "assistant", content: text });
   } catch (err) {
     bubble.textContent = err.text || "";
-    const copy = { not_granted: "The AI guide needs your permission to run. You can allow it next time you ask.", sampling_disabled: "Claude isn't available for this account.", rate_limited: "Too many questions at once. Wait a moment and ask again.", refused: "I can't help with that one. Try asking another way.", session_expired: "Please sign in again to Claude.", cancelled: "" }[err.code] ?? "Something went wrong reaching the guide. Try again.";
+    const copy = { not_granted: "The AI guide needs your permission to run. You can allow it next time you ask.", sampling_disabled: "The AI guide isn't available for this account.", rate_limited: "Too many questions at once. Wait a moment and ask again.", refused: "I can't help with that one. Try asking another way.", session_expired: "Your session has ended. Reload the page and try again.", cancelled: "" }[err.code] ?? "Something went wrong reaching the guide. Try again.";
     if (!err.text) bubble.remove();
     if (copy) addMsg("sys", copy);
     turns.pop();
@@ -1975,7 +1977,7 @@ $("#askForm").addEventListener("submit", async e => {
 $("#askInput").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#askForm").requestSubmit(); } });
 $("#stopBtn").onclick = () => ctl?.abort();
 (async () => { try { sample = window.claude ? await window.claude.use("sample") : null; } catch { sample = null; }
-  if (!sample) addMsg("sys", "The AI guide works when LocateWright is opened in Claude. Everything else on the page works anywhere."); })();
+  if (!sample && AI) addMsg("sys", "The AI guide isn't available right now."); })();
 
 /* ---------- map ---------- */
 const map = (() => {

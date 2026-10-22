@@ -13,7 +13,7 @@ Designed and developed by Promintal Consulting UK.
 - **Living costs**: 2026/27 Band D council tax for every council in England, Scotland and Wales, NI domestic rate poundages, ONS rents, Ofgem price cap, water bills and TV licence.
 - **Compare** up to three places, **Budget** planner, **Settle-in** checklist per nation.
 - **Visitor analytics** with a private live dashboard at `/admin` (Cloudflare Worker + D1).
-- **Ask a local** and **AI local guides** for any town or village (uses the viewer's Claude account when opened as a Claude artifact; hidden elsewhere).
+- **Ask a local** and **AI local guides** for any town or village (shown only where an AI runtime is available; hidden on the public site).
 
 ## Visitor analytics
 
@@ -27,7 +27,7 @@ Open **`/admin`** (for example `https://locatewright.promintal.com/admin`) and e
 - **Searches with no result**, to show which places people expect to find
 - **Referring sites, countries, cities, devices**, a **recent activity** feed and a **CSV download**
 
-Tracking is off when the page is opened as a file, on localhost, inside claude.ai, and when the browser sends Do Not Track or Global Privacy Control. Crawlers are not counted.
+Tracking is off when the page is opened as a file, on localhost, inside the AI runtime, and when the browser sends Do Not Track or Global Privacy Control. Crawlers are not counted.
 
 ## Data and privacy
 
