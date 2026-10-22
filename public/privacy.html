@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy · LocateWright</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F3F8;--panel:#fff;--ink:#1B1326;--muted:#5A5068;--line:#DDD5E8;--route:#4A1D8C;--sign:#FFD200;--accent:#5B26A8;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#120C1B;--panel:#1C1428;--ink:#F1ECF8;--muted:#B3A8C4;--line:#33284A;--route:#4B2287;--accent:#C2A3FF;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Source Sans 3",system-ui,sans-serif}
+header{background:var(--route);color:#fff;border-bottom:4px solid var(--sign)}
+header div{max-width:760px;margin:0 auto;padding:14px 16px;font:800 20px Archivo,sans-serif}
+header a{color:#fff;text-decoration:none}
+main{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+h1{font:800 30px/1.2 Archivo,sans-serif;margin:0 0 6px}
+h2{font:800 19px Archivo,sans-serif;margin:28px 0 6px}
+a{color:var(--accent)}
+.muted{color:var(--muted)}
+li{margin:4px 0}
+</style>
+</head>
+<body>
+<header><div><a href="/">LocateWright</a></div></header>
+<main>
+<h1>Privacy notice</h1>
+<p class="muted">Last updated 22 October 2026</p>
+
+<p>LocateWright is run by Promintal Consulting Limited (“we”). This notice explains what we record when you use the site and why. Contact us at <a href="mailto:info@promintal.co.uk">info@promintal.co.uk</a>.</p>
+
+<h2>What we record</h2>
+<p>To understand which places people are researching and to improve the guide, we record anonymous usage events:</p>
+<ul>
+  <li>that a page was opened, and the name of the site that linked to us (not the full address)</li>
+  <li>which places, guide tabs, sections (Compare, Budget, Settle in) and map layers you open</li>
+  <li>search words that found no match, so we can add missing places</li>
+  <li>your approximate country and city, worked out by our host Cloudflare from your connection</li>
+  <li>whether you are on a desktop, mobile or tablet</li>
+  <li>a random visitor ID stored in your browser, so repeat visits are not counted twice</li>
+</ul>
+
+<h2>What we do not record</h2>
+<ul>
+  <li>Your IP address, name, email or any account details. LocateWright has no sign-in.</li>
+  <li>Figures you type into the Budget planner, or anything you write in Ask a local.</li>
+  <li>Anything from other websites. We use no advertising or third-party tracking cookies.</li>
+</ul>
+
+<h2>Turning it off</h2>
+<p>Nothing is recorded if your browser sends <b>Do Not Track</b> or <b>Global Privacy Control</b>. You can also clear the site's data in your browser to remove the visitor ID.</p>
+
+<h2>Lawful basis and storage</h2>
+<p>We rely on our legitimate interest in running and improving the service. The visitor ID is kept in your browser's local storage, which we use only to measure use of the site you are visiting. Events are stored in a Cloudflare D1 database and deleted after about 13 months. Only Promintal Consulting staff can view the statistics.</p>
+
+<h2>Your rights</h2>
+<p>Under UK GDPR you can ask us about the data we hold, or ask us to delete it, by emailing <a href="mailto:info@promintal.co.uk">info@promintal.co.uk</a>. Because we hold no names or contact details, we may need your visitor ID (shown below) to find your events. You can also complain to the Information Commissioner's Office at <a href="https://ico.org.uk">ico.org.uk</a>.</p>
+<p class="muted">Your visitor ID: <code id="vid">none</code></p>
+<script>try{const v=localStorage.getItem("lw:vid");if(v)document.getElementById("vid").textContent=v;}catch(e){}</script>
+</main>
+</body>
+</html>

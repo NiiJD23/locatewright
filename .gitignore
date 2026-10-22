@@ -2,3 +2,5 @@ node_modules/
 __pycache__/
 *.gz
 .DS_Store
+.wrangler/
+.dev.vars

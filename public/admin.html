@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>LocateWright Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F5F3F8;--panel:#fff;--sunk:#ECE7F3;--ink:#1B1326;--muted:#5A5068;--line:#DDD5E8;--route:#4A1D8C;--route-ink:#fff;--sign:#FFD200;--accent:#5B26A8;--accent-soft:#EBE2F8;--ok:#2F8A58;--r:6px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#120C1B;--panel:#1C1428;--sunk:#251B34;--ink:#F1ECF8;--muted:#B3A8C4;--line:#33284A;--route:#4B2287;--accent:#C2A3FF;--accent-soft:#2D2145;--ok:#5FCB8E;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Source Sans 3",system-ui,sans-serif}
+h1,h2,h3{font-family:Archivo,system-ui,sans-serif;margin:0}
+.bar{background:var(--route);color:var(--route-ink);border-bottom:4px solid var(--sign)}
+.bar .in{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:20px;font-weight:800;letter-spacing:-.01em}
+.bar h1 small{font:500 12px "IBM Plex Mono",monospace;opacity:.8;margin-left:8px}
+.bar .sp{flex:1}
+.bar button,.bar select,.bar a{font:600 14px "Source Sans 3",sans-serif;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:var(--r);padding:6px 10px;text-decoration:none;cursor:pointer}
+.bar select option{color:#111}
+main{max-width:1200px;margin:0 auto;padding:20px 16px 48px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;grid-column:span 12;min-width:0}
+.c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}
+@media (max-width:900px){.c4,.c6,.c8{grid-column:span 12}}
+.card h2{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;display:flex;gap:8px;align-items:center}
+.card h2 .n{font:500 12px "IBM Plex Mono",monospace;color:var(--muted);text-transform:none;letter-spacing:0;margin-left:auto}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--sunk);border-radius:var(--r);padding:12px}
+.kpi .v{font:800 28px/1.1 Archivo,sans-serif;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:13px;color:var(--muted)}
+.kpi .s{font:500 12px "IBM Plex Mono",monospace;color:var(--muted);margin-top:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block;box-shadow:0 0 0 0 var(--ok);animation:p 2s infinite}
+@keyframes p{70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line);padding:6px 6px 6px 0}
+td{border-bottom:1px solid var(--line);padding:6px 6px 6px 0;vertical-align:top;overflow-wrap:anywhere}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meter{height:6px;background:var(--accent-soft);border-radius:3px;margin-top:3px}.meter i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.tag{font:500 11px "IBM Plex Mono",monospace;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:1px 5px;margin-left:6px;white-space:nowrap}
+.muted{color:var(--muted)}.small{font-size:13px}
+.scroll{max-height:420px;overflow:auto}
+svg text{fill:var(--muted);font:500 10px "IBM Plex Mono",monospace}
+.funnel .row{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;margin:6px 0;font-size:14px}
+.funnel .row div:nth-child(2){height:18px;background:var(--accent-soft);border-radius:3px}
+.funnel .row div:nth-child(2) i{display:block;height:100%;background:var(--route);border-radius:3px}
+#login{max-width:420px;margin:12vh auto;padding:24px}
+#login input{width:100%;font:16px "IBM Plex Mono",monospace;padding:10px;border:1px solid var(--line);border-radius:var(--r);background:var(--sunk);color:var(--ink);margin:12px 0}
+#login button{font:700 15px Archivo,sans-serif;background:var(--route);color:#fff;border:0;border-left:6px solid var(--sign);border-radius:var(--r);padding:10px 16px;cursor:pointer}
+.err{color:#C0392B;font-weight:600}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font:500 12px "IBM Plex Mono",monospace;padding:6px 8px;border-radius:4px;display:none;z-index:9}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="5" fill="#fff" fill-opacity=".14" stroke="#FFD200" stroke-width="2"/><path d="M16 7c-3.6 0-6.4 2.8-6.4 6.3 0 4.6 6.4 11.7 6.4 11.7s6.4-7.1 6.4-11.7C22.4 9.8 19.6 7 16 7z" fill="#FFD200"/><circle cx="16" cy="13.3" r="2.4" fill="#4A1D8C"/></svg>
+  <h1>LocateWright Analytics <small id="stamp"></small></h1>
+  <span class="sp"></span>
+  <select id="range" aria-label="Period"><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option></select>
+  <button id="csv" type="button">Download CSV</button>
+  <a href="/">Open site</a>
+  <button id="out" type="button">Sign out</button>
+</div></div>
+
+<div id="login" class="card" hidden>
+  <h2>Sign in</h2>
+  <p class="muted small">Enter the <code>ADMIN_TOKEN</code> secret set on the Cloudflare Worker. It is kept only for this browser tab.</p>
+  <form id="lf"><input id="tok" type="password" autocomplete="current-password" placeholder="Admin token" required><button>Open dashboard</button></form>
+  <p id="lerr" class="err" hidden></p>
+</div>
+
+<main id="dash" hidden>
+  <div class="grid">
+    <section class="card"><h2>Overview</h2><div class="kpis" id="kpis"></div></section>
+
+    <section class="card c4"><h2><span class="dot"></span> Live now <span class="n" id="liveN"></span></h2>
+      <p class="muted small" style="margin:0 0 8px">Visitors with LocateWright open in the last 90 seconds.</p><div class="scroll" id="live"></div></section>
+    <section class="card c8"><h2>Last 30 days <span class="n">visits · visitors · places opened</span></h2><div id="chart"></div></section>
+
+    <section class="card c8"><h2>Most viewed places <span class="n" id="placesN"></span></h2><div class="scroll" id="places"></div></section>
+    <section class="card c4"><h2>Visitor journey</h2><div class="funnel" id="funnel"></div>
+      <h2 style="margin-top:18px">How places were found</h2><div id="via"></div></section>
+
+    <section class="card c4"><h2>Nations</h2><div id="nations"></div></section>
+    <section class="card c4"><h2>Councils</h2><div class="scroll" id="councils"></div></section>
+    <section class="card c4"><h2>Guide tabs read</h2><div id="tabs"></div></section>
+
+    <section class="card c4"><h2>Sections used</h2><div id="views"></div><h2 style="margin-top:18px">Map layers</h2><div id="layers"></div></section>
+    <section class="card c4"><h2>Searches with no result</h2><p class="muted small" style="margin:0 0 8px">Places people looked for that LocateWright couldn't find.</p><div class="scroll" id="misses"></div></section>
+    <section class="card c4"><h2>Referring sites</h2><div class="scroll" id="refs"></div></section>
+
+    <section class="card c4"><h2>Countries</h2><div class="scroll" id="countries"></div></section>
+    <section class="card c4"><h2>Cities</h2><div class="scroll" id="cities"></div></section>
+    <section class="card c4"><h2>Devices</h2><div id="devices"></div><h2 style="margin-top:18px">AI local guides written</h2><div id="guides"></div></section>
+
+    <section class="card"><h2>Recent activity</h2><div class="scroll" id="recent"></div></section>
+  </div>
+  <p class="muted small">Refreshes every 15 seconds. No IP addresses, names or emails are stored. Visitor IDs are random and kept in the visitor's browser. Events are deleted after about 13 months.</p>
+</main>
+<div id="tip"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = n => Number(n || 0).toLocaleString("en-GB");
+const NATION = { england: "England", scotland: "Scotland", wales: "Wales", ni: "Northern Ireland" };
+const VIEW = { explore: "Explore", compare: "Compare", budget: "Budget", ask: "Ask a local", settle: "Settle in" };
+const TYPE = { pageview: "Opened LocateWright", place: "Viewed place", tab: "Read tab", view: "Opened section", layer: "Changed map layer", search_miss: "Search with no result", ai_guide: "AI guide written" };
+const DEV = { desktop: "Desktop", mobile: "Mobile", tablet: "Tablet" };
+let token = sessionStorage.getItem("lw-admin") || "", timer = null;
+const flag = cc => cc && /^[A-Z]{2}$/.test(cc) ? String.fromCodePoint(...[...cc].map(c => 127397 + c.charCodeAt(0))) + " " : "";
+let regionName; try { regionName = new Intl.DisplayNames(["en-GB"], { type: "region" }); } catch { regionName = null; }
+const country = cc => { if (!cc) return "Unknown"; try { return flag(cc) + (regionName ? regionName.of(cc) : cc); } catch { return cc; } };
+const ago = ts => { const s = Math.max(0, (Date.now() - ts) / 1000); return s < 60 ? Math.round(s) + "s ago" : s < 3600 ? Math.round(s / 60) + "m ago" : s < 86400 ? Math.round(s / 3600) + "h ago" : new Date(ts).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); };
+
+function list(rows, label = r => esc(r.k), opts = {}) {
+  if (!rows || !rows.length) return '<p class="muted small">Nothing yet.</p>';
+  const max = Math.max(...rows.map(r => r.n));
+  return `<table><thead><tr><th>${opts.head || ""}</th><th class="num">${opts.n || "Count"}</th><th class="num">Visitors</th></tr></thead><tbody>${rows.map(r =>
+    `<tr><td>${label(r)}<div class="meter"><i style="width:${(r.n / max * 100).toFixed(1)}%"></i></div></td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.u)}</td></tr>`).join("")}</tbody></table>`;
+}
+
+function chart(daily) {
+  const days = []; const now = new Date();
+  for (let i = 29; i >= 0; i--) { const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - i)); days.push(d.toISOString().slice(0, 10)); }
+  const by = Object.fromEntries((daily || []).map(r => [r.day, r]));
+  const W = 760, H = 220, P = 28, bw = (W - P) / 30;
+  const max = Math.max(4, ...days.map(d => Math.max(by[d]?.visits || 0, by[d]?.places || 0)));
+  let svg = `<svg viewBox="0 0 ${W} ${H + 20}" width="100%" role="img" aria-label="Daily visits, visitors and places opened for the last 30 days">`;
+  for (let g = 0; g <= 4; g++) { const y = H - g / 4 * (H - 10); svg += `<line x1="${P}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${P - 4}" y="${y + 3}" text-anchor="end">${fmt(Math.round(max * g / 4))}</text>`; }
+  const pts = [];
+  days.forEach((d, i) => {
+    const r = by[d] || {}, x = P + i * bw, hv = (r.visits || 0) / max * (H - 10);
+    svg += `<rect x="${x + 2}" y="${H - hv}" width="${bw - 4}" height="${hv}" rx="2" fill="var(--accent)" opacity=".85" data-t="${d}: ${fmt(r.visits)} visits, ${fmt(r.visitors)} visitors, ${fmt(r.places)} places opened"/>`;
+    pts.push(`${x + bw / 2},${H - (r.places || 0) / max * (H - 10)}`);
+    if (i % 5 === 4 || i === 0) svg += `<text x="${x + bw / 2}" y="${H + 14}" text-anchor="middle">${new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</text>`;
+  });
+  svg += `<polyline points="${pts.join(" ")}" fill="none" stroke="var(--sign)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  svg += `</svg><p class="small muted" style="margin:6px 0 0"><span style="display:inline-block;width:10px;height:10px;background:var(--accent);border-radius:2px"></span> Visits &nbsp; <span style="display:inline-block;width:14px;height:3px;background:var(--sign);vertical-align:middle"></span> Places opened &nbsp; Hover a bar for visitors.</p>`;
+  return svg;
+}
+
+function render(d) {
+  $("#stamp").textContent = "updated " + new Date(d.now).toLocaleTimeString("en-GB");
+  const t = d.totals, k = (v, l, s) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div>${s ? `<div class="s">${s}</div>` : ""}</div>`;
+  $("#kpis").innerHTML = k(fmt(d.live.length), "Live now", "last 90 seconds")
+    + k(fmt(t.d1.visits), "Visits, 24 hours", `${fmt(t.d1.visitors)} visitors`)
+    + k(fmt(t.d7.visits), "Visits, 7 days", `${fmt(t.d7.visitors)} visitors`)
+    + k(fmt(t.d30.visits), "Visits, 30 days", `${fmt(t.d30.visitors)} visitors · ${fmt(t.d30.distinct_places)} places`);
+  $("#liveN").textContent = d.live.length;
+  $("#live").innerHTML = d.live.length ? `<table><tbody>${d.live.map(r => `<tr><td><b>${esc(r.place_name || "Browsing")}</b>${r.detail && VIEW[r.detail] ? `<span class="tag">${VIEW[r.detail]}</span>` : ""}<div class="small muted">${esc([r.city, country(r.country)].filter(Boolean).join(", "))} · ${DEV[r.device] || ""}</div></td><td class="num small muted">${ago(r.ts)}</td></tr>`).join("")}</tbody></table>` : '<p class="muted small">No one right now.</p>';
+  $("#chart").innerHTML = chart(d.daily);
+  $("#placesN").textContent = `${d.days === 1 ? "24 hours" : d.days + " days"}`;
+  $("#places").innerHTML = list(d.places, r => `<b>${esc(r.k)}</b>${r.f ? '<span class="tag">Full guide</span>' : ""}<div class="small muted">${esc(r.c || "")}${r.nation ? " · " + NATION[r.nation] : ""}</div>`, { head: "Place", n: "Views" });
+  const f = d.funnel || {}, base = Math.max(1, f.visited || 0);
+  $("#funnel").innerHTML = [["Visited", f.visited], ["Opened a place", f.opened_place], ["Read a guide tab", f.read_tabs], ["Compared or budgeted", f.planned], ["Opened Settle in", f.settle]]
+    .map(([l, v]) => `<div class="row"><span>${l}</span><div><i style="width:${((v || 0) / base * 100).toFixed(1)}%"></i></div><span class="num" style="text-align:right">${fmt(v)}</span></div>`).join("");
+  $("#via").innerHTML = list(d.via, r => ({ browse: "Map or list", search: "Search" }[r.k] || esc(r.k)), { head: "Route", n: "Views" });
+  $("#nations").innerHTML = list(d.nations, r => NATION[r.k] || esc(r.k), { head: "Nation", n: "Views" });
+  $("#councils").innerHTML = list(d.councils, undefined, { head: "Council", n: "Views" });
+  $("#tabs").innerHTML = list(d.tabs, r => esc(r.k.charAt(0).toUpperCase() + r.k.slice(1)), { head: "Tab", n: "Opens" });
+  $("#views").innerHTML = list(d.views, r => VIEW[r.k] || esc(r.k), { head: "Section", n: "Opens" });
+  $("#layers").innerHTML = list(d.layers, r => ({ rent: "Rent", tax: "Local tax", flat: "Places only" }[r.k] || esc(r.k)), { head: "Layer", n: "Switches" });
+  $("#misses").innerHTML = list(d.misses, r => `<code>${esc(r.k)}</code>`, { head: "Searched for", n: "Times" });
+  $("#refs").innerHTML = list(d.refs, r => esc(r.k), { head: "Site", n: "Visits" });
+  $("#countries").innerHTML = list(d.countries, r => esc(country(r.k)), { head: "Country", n: "Visits" });
+  $("#cities").innerHTML = list(d.cities, undefined, { head: "City", n: "Visits" });
+  $("#devices").innerHTML = list(d.devices, r => DEV[r.k] || esc(r.k), { head: "Device", n: "Visits" });
+  $("#guides").innerHTML = list(d.guides, undefined, { head: "Place", n: "Guides" });
+  $("#recent").innerHTML = d.recent.length ? `<table><thead><tr><th>When</th><th>What</th><th>Where from</th></tr></thead><tbody>${d.recent.map(r => {
+    const what = r.type === "view" ? VIEW[r.detail] || r.detail : r.type === "layer" ? r.detail : r.type === "search_miss" ? `“${r.detail}”` : r.type === "tab" ? `${r.detail} · ${r.place_name || ""}` : r.place_name || (r.type === "pageview" && VIEW[r.detail]) || "";
+    return `<tr><td class="small muted" style="white-space:nowrap">${ago(r.ts)}</td><td>${TYPE[r.type] || esc(r.type)}${what ? `: <b>${esc(what)}</b>` : ""}${r.council && r.type === "place" ? `<span class="small muted"> · ${esc(r.council)}</span>` : ""}</td><td class="small">${esc([r.city, country(r.country)].filter(Boolean).join(", "))} · ${DEV[r.device] || ""}</td></tr>`; }).join("")}</tbody></table>` : '<p class="muted small">Nothing yet.</p>';
+}
+
+async function load() {
+  try {
+    const r = await fetch(`/api/admin/summary?days=${$("#range").value}`, { headers: { authorization: "Bearer " + token }, cache: "no-store" });
+    if (r.status === 401) return signOut("That token was not accepted.");
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "HTTP " + r.status);
+    render(await r.json());
+  } catch (e) { $("#stamp").textContent = "couldn't refresh: " + e.message; }
+}
+function start() { $("#login").hidden = true; $("#dash").hidden = false; load(); clearInterval(timer); timer = setInterval(() => { if (document.visibilityState === "visible") load(); }, 15000); }
+function signOut(msg) { token = ""; sessionStorage.removeItem("lw-admin"); clearInterval(timer); $("#dash").hidden = true; $("#login").hidden = false; $("#lerr").hidden = !msg; $("#lerr").textContent = msg || ""; }
+$("#lf").onsubmit = e => { e.preventDefault(); token = $("#tok").value.trim(); sessionStorage.setItem("lw-admin", token); $("#tok").value = ""; start(); };
+$("#out").onclick = () => signOut();
+$("#range").onchange = load;
+$("#csv").onclick = async () => {
+  const r = await fetch(`/api/admin/events.csv?days=${$("#range").value}`, { headers: { authorization: "Bearer " + token } });
+  if (!r.ok) return alert("Download failed.");
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(await r.blob()), download: `locatewright-events-${$("#range").value}d.csv` }); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+const tip = $("#tip");
+document.addEventListener("mousemove", e => { const t = e.target.dataset && e.target.dataset.t; if (t) { tip.textContent = t; tip.style.display = "block"; tip.style.left = Math.min(innerWidth - 260, e.clientX + 12) + "px"; tip.style.top = e.clientY + 14 + "px"; } else tip.style.display = "none"; });
+token ? start() : signOut();
+</script>
+</body>
+</html>

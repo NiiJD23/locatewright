@@ -500,7 +500,7 @@ footer b{color:#fff!important}
 </main>
 
 <footer><div class="wrap in">
-  <div><b style="color:var(--ink)">Designed and developed by Promintal Consulting UK.</b> Sources ·  figures checked <span id="updated"></span>. Rents are ONS averages for the whole council or rental-market area, not a quote for a specific home.</div>
+  <div><b style="color:var(--ink)">Designed and developed by Promintal Consulting UK.</b> Sources ·  figures checked <span id="updated"></span>. Rents are ONS averages for the whole council or rental-market area, not a quote for a specific home. <a href="/privacy" id="privacyLink">Privacy</a></div>
   <ol id="sources"></ol>
 </div></footer>
 
@@ -1391,6 +1391,34 @@ UKC.sources.push(["DoF NI rate poundages 2026/27", "https://www.finance-ni.gov.u
 const $ = s => document.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === "class") e.className = v; else if (k === "text") e.textContent = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else if (v !== null && v !== undefined && v !== false) e.setAttribute(k, v === true ? "" : v); } for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k)); return e; };
 const gbp = (n, dp = 0) => n == null || isNaN(n) ? "—" : "£" + Number(n).toLocaleString("en-GB", { minimumFractionDigits: dp, maximumFractionDigits: dp });
+/* ---------- visitor analytics (live site only) ----------
+   Sends page views and which places, views and tabs are opened to /api/event on the site's own Worker.
+   Off inside Claude, when opened as a file, on localhost, and when the browser sends Do Not Track or Global Privacy Control.
+   No names, emails, IP addresses or chat text are sent. */
+const TRACK_ON = !window.claude && /^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)
+  && navigator.doNotTrack !== "1" && window.doNotTrack !== "1" && !navigator.globalPrivacyControl;
+const rid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12));
+const VID = (() => { let v = null; try { v = localStorage.getItem("lw:vid"); } catch {} if (!v || !/^[A-Za-z0-9-]{8,64}$/.test(v)) { v = rid(); try { localStorage.setItem("lw:vid", v); } catch {} } return v; })();
+const SID = rid();
+let trackVia = "browse";
+function track(type, extra) {
+  if (!TRACK_ON) return;
+  try {
+    const body = JSON.stringify(Object.assign({ type, vid: VID, sid: SID, path: location.pathname, ref: type === "pageview" ? document.referrer.slice(0, 300) : "" }, extra || {}));
+    if (navigator.sendBeacon && navigator.sendBeacon("/api/event", new Blob([body], { type: "application/json" }))) return;
+    fetch("/api/event", { method: "POST", headers: { "content-type": "application/json" }, body, keepalive: true }).catch(() => {});
+  } catch {}
+}
+function placeInfo(id) {
+  try { const p = byId[id]; if (!p) return {};
+    return { place: String(id), place_name: p.name, nation: p.nation, council: p.generic ? C[p.ci][0] : p.council[0], featured: !p.generic };
+  } catch { return {}; }
+}
+let currentView = "explore";
+if (TRACK_ON) {
+  const beat = () => { try { if (document.visibilityState === "visible") track("heartbeat", Object.assign({ detail: currentView }, placeInfo(state.place))); } catch {} };
+  setInterval(beat, 30000); document.addEventListener("visibilitychange", beat);
+}
 const store = { get(k, d) { try { const v = localStorage.getItem("lw:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem("lw:" + k, JSON.stringify(v)); } catch {} } };
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const NKEYS = ["england", "scotland", "wales", "ni"];
@@ -1521,6 +1549,7 @@ function selectPlace(id, fly) {
   if (p.generic && !["overview", "guide", "costs", "council", "env"].includes(state.tab)) state.tab = "overview";
   renderPicker(); renderDossier(); renderGlance(); map.select(id, fly);
   if ($("#v-explore").hidden) showView("explore");
+  if (booted) track("place", Object.assign({ detail: trackVia }, placeInfo(id))); trackVia = "browse";
 }
 function stat(v, s) { return el("div", { class: "stat" }, el("span", { class: "v", text: v }), el("span", { class: "s", text: s })); }
 function renderDossier() {
@@ -1537,7 +1566,7 @@ function renderDossier() {
     stat(p.pop.replace(/^about /, "").replace(/ \(.*/, "").replace(/ in .*/, ""), "people, approx. (council area)"),
     stat(p.rent ? gbp(essentialsMonth(p)) : "—", "monthly essentials (rent, tax, bills)")));
   const tabs = el("div", { class: "tabs", role: "tablist" });
-  for (const [k, label] of TABS) tabs.append(el("button", { role: "tab", "aria-selected": String(state.tab === k), id: "tab-" + k, onclick: () => { state.tab = k; renderDossier(); } , text: label }));
+  for (const [k, label] of TABS) tabs.append(el("button", { role: "tab", "aria-selected": String(state.tab === k), id: "tab-" + k, onclick: () => { state.tab = k; renderDossier(); track("tab", Object.assign({ detail: k }, placeInfo(state.place))); } , text: label }));
   d.append(tabs);
   const panel = el("div", { class: "tabpanel", role: "tabpanel", "aria-labelledby": "tab-" + state.tab });
   panel.append(...tabBody(p, n));
@@ -1621,7 +1650,7 @@ function renderGeneric(p, n, d) {
     stat(p.size.replace("Large village or small town", "Small town"), "type of place (approx.)"),
     stat(gbp(essentialsMonth(p)), "monthly essentials (rent, tax, bills)")));
   const tabs = el("div", { class: "tabs", role: "tablist" });
-  for (const [k, label] of GTABS) tabs.append(el("button", { role: "tab", "aria-selected": String(state.tab === k), id: "tab-" + k, onclick: () => { state.tab = k; renderDossier(); }, text: label }));
+  for (const [k, label] of GTABS) tabs.append(el("button", { role: "tab", "aria-selected": String(state.tab === k), id: "tab-" + k, onclick: () => { state.tab = k; renderDossier(); track("tab", Object.assign({ detail: k }, placeInfo(state.place))); }, text: label }));
   d.append(tabs);
   const panel = el("div", { class: "tabpanel", role: "tabpanel", "aria-labelledby": "tab-" + state.tab });
   panel.append(...genericBody(p, n)); d.append(panel);
@@ -1694,7 +1723,7 @@ function guideView(p) {
       try {
         const j = await sample.json(guidePrompt(p), { cache: { gcTime: 86400000 } });
         if (!j || typeof j !== "object") throw { code: "invalid_json" };
-        guideMem[guideKey(p)] = j; store.set(guideKey(p), j);
+        guideMem[guideKey(p)] = j; store.set(guideKey(p), j); track("ai_guide", placeInfo(p.id));
       } catch (e) {
         status.textContent = { not_granted: "The guide needs your permission to use Claude.", rate_limited: "Too many requests just now. Try again in a minute.", invalid_json: "The guide came back in the wrong format. Try again.", sampling_disabled: "Claude isn't available for this account." }[e.code] || "Something went wrong writing the guide. Try again.";
         guideBusy = null; btn.disabled = false; btn.textContent = "Write the local guide"; return;
@@ -1733,9 +1762,9 @@ function brkRow(col, a, v, small) { return el("li", {}, el("i", { style: `backgr
 function cleanPill(c) { const k = /ULEZ|CAZ \(£|Zero/.test(c) ? "bad" : c === "None" || /No charge/.test(c) ? "good" : "warn"; return el("span", { class: "pill " + k, text: c === "None" ? "No charging zone" : c }); }
 
 /* ---------- search ---------- */
-const q = $("#q"), res = $("#results"); let resIdx = -1;
+const q = $("#q"), res = $("#results"); let resIdx = -1, missT = 0;
 function doSearch() {
-  const t = q.value.trim().toLowerCase(); res.replaceChildren(); resIdx = -1;
+  const t = q.value.trim().toLowerCase(); res.replaceChildren(); resIdx = -1; clearTimeout(missT);
   if (t.length < 2) { res.hidden = t.length === 0; if (t.length) res.append(el("div", { style: "padding:10px 12px;color:var(--muted)", text: "Keep typing…" })); return; }
   const feat = PLACES.filter(p => [p.name, p.native, p.region, p.council[0], p.office, ...p.hoods.map(h => h[0] + " " + (h[2] || ""))].join(" ").toLowerCase().includes(t)).slice(0, 3);
   const pc = /^[a-z]{1,2}\d/.test(t) ? t.toUpperCase().replace(/\s.*/, "") : null;
@@ -1746,9 +1775,10 @@ function doSearch() {
     else if (!pc && contains.length < 20 && nm.includes(t)) contains.push(i);
   }
   const towns = [...starts.sort((a, b) => T[b][4] - T[a][4]), ...contains].slice(0, 8 - feat.length);
+  if (!feat.length && !towns.length) { clearTimeout(missT); missT = setTimeout(() => track("search_miss", { detail: t.slice(0, 40) }), 1500); }
   if (!feat.length && !towns.length) res.append(el("div", { style: "padding:10px 12px;color:var(--muted)", text: "No match. Try a city, town, village, council or postcode district such as LN1." }));
-  for (const p of feat) res.append(el("button", { onclick: () => { selectPlace(p.id, true); q.value = ""; res.hidden = true; } }, el("b", {}, p.name, el("span", { class: "pc", text: "Full guide" })), el("span", { text: p.region + ", " + NATIONS[p.nation].name })));
-  for (const i of towns) res.append(el("button", { onclick: () => { selectPlace("t" + i, true); q.value = ""; res.hidden = true; } }, el("b", { text: T[i][0] }), el("span", { text: SIZE[T[i][4]] + " · " + C[T[i][3]][0] })));
+  for (const p of feat) res.append(el("button", { onclick: () => { trackVia = "search"; selectPlace(p.id, true); q.value = ""; res.hidden = true; } }, el("b", {}, p.name, el("span", { class: "pc", text: "Full guide" })), el("span", { text: p.region + ", " + NATIONS[p.nation].name })));
+  for (const i of towns) res.append(el("button", { onclick: () => { trackVia = "search"; selectPlace("t" + i, true); q.value = ""; res.hidden = true; } }, el("b", { text: T[i][0] }), el("span", { text: SIZE[T[i][4]] + " · " + C[T[i][3]][0] })));
   res.hidden = false;
 }
 q.addEventListener("input", doSearch);
@@ -1768,6 +1798,8 @@ function showView(v) {
   if (v === "budget") budget.render();
   if (v === "settle") settle.render();
   if (booted) document.querySelector("main").scrollIntoView({ block: "start" });
+  if (booted && v !== currentView) track("view", Object.assign({ detail: v }, placeInfo(state.place)));
+  currentView = v;
 }
 let booted = false;
 document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); showView(a.dataset.view); }));
@@ -2135,7 +2167,7 @@ const map = (() => {
     }
   }
   function setLayer(l) { state.layer = l; for (const p of PLACES) pins[p.id].target = heightFor(p); recolour(); legend(); document.querySelectorAll("[data-layer]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.layer === l))); }
-  document.querySelectorAll("[data-layer]").forEach(b => b.addEventListener("click", () => setLayer(b.dataset.layer)));
+  document.querySelectorAll("[data-layer]").forEach(b => b.addEventListener("click", () => { setLayer(b.dataset.layer); track("layer", { detail: b.dataset.layer }); }));
   setLayer("rent");
 
   /* ---- camera ---- */
@@ -2217,6 +2249,8 @@ renderPicker(); renderDossier(); renderGlance();
 askSetPlace(state.place);
 const startView = VIEWS.includes(hashTok) ? hashTok : "explore";
 showView(startView); booted = true;
+if (window.claude || !/^https?:$/.test(location.protocol)) $("#privacyLink").hidden = true;
+track("pageview", Object.assign({ detail: startView }, placeInfo(state.place)));
 })();
 </script>
 
