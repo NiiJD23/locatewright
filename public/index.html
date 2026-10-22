@@ -6,9 +6,11 @@
 </head>
 <body>
 <title>LocateWright</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/selawik-regular.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="fonts/selawik-bold.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"Selawik";src:url("fonts/selawik-light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"Selawik";src:url("fonts/selawik-regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Selawik";src:url("fonts/selawik-bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
 /* Layout: BidWright family shell — white brand bar, lavender step nav, gradient hero band with "At a glance" card, then the map-and-dossier bench. */
 /* Layout: "Signpost" in purple — a UK primary-route sign as the header and glance card, OS-map contours in the hero, map-and-dossier bench below. */
 :root{
@@ -21,9 +23,9 @@
   --sea:#E2DDEB; --land-ghost:#D8D2E2;
   --eng:#C0584A; --sco:#3F5FB2; --wal:#2F8A58; --ni:#C3861F;
   --good:#1D7A3A; --good-bg:#E0F2E4; --warn:#8A5300; --warn-bg:#FFF2C2; --bad:#B0302A; --bad-bg:#FBE4E2;
-  --f-display:"Archivo","Arial Narrow",Arial,sans-serif;
-  --f-body:"Source Sans 3","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-display:"Selawik","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  --f-body:"Selawik","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  --f-mono:"Selawik","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
   --r:6px; --shadow:0 1px 0 rgba(16,32,26,.06),0 2px 8px rgba(16,32,26,.06);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -283,7 +285,7 @@ footer ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
 body{font-size:16.5px}
 body::before{background:var(--route)}
 h1,h2,h3{font-family:var(--f-display);letter-spacing:-.01em}
-.num,.stat .v,.total .big,.pl span.num{font-family:var(--f-mono);font-weight:500}
+.num,.stat .v,.total .big,.pl span.num{font-family:var(--f-mono);font-weight:700;font-variant-numeric:tabular-nums}
 .eyebrow{font-family:var(--f-display);font-weight:700;letter-spacing:.14em;font-size:12px;color:var(--muted)}
 .top{background:var(--route);box-shadow:0 2px 0 var(--route-deep)}
 .signbar .wrap{display:flex;align-items:center;gap:20px;min-height:68px;flex-wrap:wrap;padding-block:8px}

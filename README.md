@@ -74,6 +74,7 @@ data-build/       scripts and sources for the embedded data
 - OS Open Names and ONS Postcode Directory, contains OS data © Crown copyright and database right; ONS boundaries (OGL v3.0)
 - mySociety UK local authority names and codes (see that repository for its licence)
 - GeoNames (CC BY 4.0); Natural Earth (public domain)
+- Font: Selawik by Microsoft (github.com/microsoft/Selawik), SIL Open Font License 1.1, compiled from the source UFOs to WOFF2 in `public/fonts/` (licence in `public/fonts/Selawik-OFL.txt`)
 - Ofgem energy price cap, Water UK average bills, DCMS TV licence fee
 
 Figures checked October 2026. Rents are area averages, not quotes for a specific home.
