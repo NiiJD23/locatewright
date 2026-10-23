@@ -278,6 +278,7 @@ td.best::after{content:" ✓"}
 footer{border-top:1px solid var(--line);color:var(--muted);font-size:14px;padding-block:22px 34px}
 footer .in{display:flex;flex-direction:column;gap:10px}
 footer ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
+footer .footlinks{display:flex;gap:22px;flex-wrap:wrap}footer .footlinks a{font-weight:700;display:inline-block;padding:6px 0}
 @media (max-width:700px){footer ol{columns:1}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
@@ -501,8 +502,9 @@ footer b{color:#fff!important}
 </main>
 
 <footer><div class="wrap in">
-  <div><b style="color:var(--ink)">Designed and developed by Promintal Consulting UK.</b> Sources ·  figures checked <span id="updated"></span>. Rents are ONS averages for the whole council or rental-market area, not a quote for a specific home. <a href="/privacy" id="privacyLink">Privacy</a></div>
-  <ol id="sources"></ol>
+  <div><b style="color:var(--ink)">Designed and developed by Promintal Consulting UK.</b> Figures checked <span id="updated"></span>. Rents are ONS averages for the whole council or rental-market area, not a quote for a specific home.</div>
+  <nav class="footlinks" aria-label="Site information"><a href="/sources" id="sourcesLink">Sources</a><a href="/privacy" id="privacyLink">Privacy</a></nav>
+  <ol id="sources" hidden></ol>
 </div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -2253,7 +2255,7 @@ renderPicker(); renderDossier(); renderGlance();
 askSetPlace(state.place);
 const startView = VIEWS.includes(hashTok) ? hashTok : "explore";
 showView(startView); booted = true;
-if (window.claude || !/^https?:$/.test(location.protocol)) $("#privacyLink").hidden = true;
+if (window.claude || !/^https?:$/.test(location.protocol)) { $("#privacyLink").hidden = true; $("#sourcesLink").hidden = true; $("#sources").hidden = false; }
 track("pageview", Object.assign({ detail: startView }, placeInfo(state.place)));
 })();
 </script>

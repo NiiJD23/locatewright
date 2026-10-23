@@ -51,6 +51,7 @@ public/
   index.html      the app (HTML, CSS, JavaScript and data in one file)
   admin.html      visitor analytics dashboard (needs ADMIN_TOKEN)
   privacy.html    privacy notice
+  sources.html    every data source, linked from the footer
   _headers        security headers
 src/worker.js     serves public/ and the analytics API (/api/event, /api/admin/*)
 wrangler.jsonc    Cloudflare Worker config with the D1 database binding
